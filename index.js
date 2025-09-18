@@ -1,22 +1,22 @@
 import express from 'express';
-import 'dotenv/config';
-import routes from './routes/objetos.mjs';
-import path from 'node:path';
+import dotenv from 'dotenv';
+import rutaAutor from './routes/rutaAutor.mjs'
+import rutaCanciones from './routes/rutaCanciones.mjs'
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 6972;
 
-// Setters
-app.set('views', path.resolve('./views'));
-app.set('view engine', 'ejs');
-app.set('PORT', process.env.PORT || 6972);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Middlewares
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json()); // si vas a manejar JSON
-app.use(express.static(path.resolve('./public'))); // servir CSS/JS
-app.use('/objetos', routes);
+//connect DB
+import './drivers/connect-db.mjs'
 
-// Start the server
-app.listen(app.get('PORT'), () =>
-  console.log(`Server is running at http://localhost:${app.get('PORT')}`)
-);
+app.use('/autor', rutaAutor);
+app.use('/canciones', rutaCanciones);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
