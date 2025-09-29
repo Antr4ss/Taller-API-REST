@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME || "uptc";
+const DB_NAME = process.env.DB_NAME;
 
 mongoose.connection.on('connected', () => {
     console.log(`MongoDB connected to database: ${DB_NAME}`);

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'tu-secreto-super-seguro-para-jwt';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware para verificar JWT
 export const authenticateToken = (req, res, next) => {
@@ -35,7 +35,7 @@ export const generateToken = (user) => {
             email: user.email 
         },
         JWT_SECRET,
-        { expiresIn: '24h' }
+        { expiresIn: '1h' }
     );
 };
 
