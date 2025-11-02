@@ -1,5 +1,6 @@
 import Cancion from "../models/Canciones.mjs";
 import Autor from "../models/Autor.mjs";
+import type { Request, Response } from 'express';
 
 /**
  * @swagger
@@ -55,24 +56,27 @@ import Autor from "../models/Autor.mjs";
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-async function findAll(req, res) {
+async function findAll(req: Request, res: Response) {
     try {
-        const { page = 1, limit = 10, search, genero, autor } = req.query;
+        // Convertir page y limit a número de forma segura
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const search = req.query.search as string;
+        const genero = req.query.genero as string;
+        const autor = req.query.autor as string;
+
         const skip = (page - 1) * limit;
-        
-        let query = { isActive: true };
-        
-        // Búsqueda por nombre
+
+        let query: any = { isActive: true };
+
         if (search) {
             query.name = { $regex: search, $options: 'i' };
         }
-        
-        // Filtro por género
+
         if (genero) {
             query.genero = { $regex: genero, $options: 'i' };
         }
-        
-        // Filtro por autor
+
         if (autor) {
             query.autor = autor;
         }
@@ -82,7 +86,7 @@ async function findAll(req, res) {
                 .populate('autor', 'name apodo nacionalidad')
                 .sort({ name: 1 })
                 .skip(skip)
-                .limit(parseInt(limit)),
+                .limit(limit),
             Cancion.countDocuments(query)
         ]);
 
@@ -90,19 +94,20 @@ async function findAll(req, res) {
             state: true,
             data: canciones,
             pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
+                page,
+                limit,
                 total,
                 pages: Math.ceil(total / limit)
             }
         });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({
             state: false,
             error: error.message
         });
     }
 }
+
 
 /**
  * @swagger
@@ -137,7 +142,7 @@ async function findAll(req, res) {
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
  */
-async function save(req, res) {
+async function save(req: Request, res: Response) {
     try {
         const nuevaCancion = new Cancion(req.body);
         const result = await nuevaCancion.save();
@@ -147,11 +152,11 @@ async function save(req, res) {
             message: "Canción creada exitosamente",
             data: result
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({
                 state: false,
-                error: Object.values(error.errors).map(e => e.message).join(', ')
+                error: Object.values(error.errors).map((e: any) => e.message).join(', ')
             });
         }
         res.status(500).json({
@@ -192,7 +197,7 @@ async function save(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function findById(req, res) {
+async function findById(req: Request, res: Response) {
     const { id } = req.params;
     try {
         const cancion = await Cancion.findById(id).populate('autor', 'name apodo nacionalidad');
@@ -206,7 +211,7 @@ async function findById(req, res) {
             state: true,
             data: cancion
         });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({
             state: false,
             error: error.message
@@ -247,7 +252,7 @@ async function findById(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function findByAutor(req, res) {
+async function findByAutor(req: Request, res: Response) {
     const { autorId } = req.params;
     try {
         // Verificar que el autor existe
@@ -268,7 +273,7 @@ async function findByAutor(req, res) {
             state: true,
             data: canciones
         });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({
             state: false,
             error: error.message
@@ -316,7 +321,7 @@ async function findByAutor(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function update(req, res) {
+async function update(req: Request, res: Response) {
     const { id } = req.params;
     try {
         const updatedCancion = await Cancion.findByIdAndUpdate(
@@ -337,11 +342,11 @@ async function update(req, res) {
             message: "Canción actualizada exitosamente",
             data: updatedCancion
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({
                 state: false,
-                error: Object.values(error.errors).map(e => e.message).join(', ')
+                error: Object.values(error.errors).map((e: any) => e.message).join(', ')
             });
         }
         res.status(500).json({
@@ -383,7 +388,7 @@ async function update(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function deleteSong(req, res) {
+async function deleteSong(req: Request, res: Response) {
     try {
         const { id } = req.params;
         
@@ -405,7 +410,7 @@ async function deleteSong(req, res) {
             state: true,
             message: "Canción eliminada exitosamente"
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message

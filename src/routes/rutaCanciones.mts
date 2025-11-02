@@ -2,7 +2,7 @@ import express from 'express';
 import { authenticateToken } from '../middlewares/auth.mjs';
 import{
   save, findAll, findById, findByAutor, deleteSong, update
-} from './../controllers/controll-canciones.mjs';
+} from '../controllers/controll-canciones.mjs';
 
 const router = express.Router();
 

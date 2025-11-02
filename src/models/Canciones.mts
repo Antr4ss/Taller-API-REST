@@ -76,7 +76,7 @@ cancionSchema.pre('save', async function(next) {
         const Autor = mongoose.model('autor');
         const autorExiste = await Autor.findById(this.autor);
         if (!autorExiste) {
-            const error = new Error('El autor especificado no existe');
+            const error = new Error('El autor especificado no existe') as any;
             error.statusCode = 400;
             return next(error);
         }

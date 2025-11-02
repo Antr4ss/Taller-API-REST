@@ -60,9 +60,9 @@ autorSchema.virtual('totalCanciones').get(function() {
 // Middleware para validar que el ID sea único
 autorSchema.pre('save', async function(next) {
     if (this.isNew) {
-        const existingAutor = await this.constructor.findOne({ id: this.id });
+        const existingAutor = await (this.constructor as mongoose.Model<any>).findOne({ id: this.id });
         if (existingAutor) {
-            const error = new Error('El ID del autor ya existe');
+            const error = new Error('El ID del autor ya existe') as any;
             error.statusCode = 400;
             return next(error);
         }

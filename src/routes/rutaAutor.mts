@@ -2,7 +2,7 @@ import express from 'express';
 import { authenticateToken } from '../middlewares/auth.mjs';
 import{
   findAll, findById, save, update, deleteAutor
-} from './../controllers/controll-autor.mjs';
+} from '../controllers/controll-autor.mjs';
 
 const router = express.Router();
 

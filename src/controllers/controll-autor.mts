@@ -1,4 +1,5 @@
-import Autor from "./../models/Autor.mjs";
+import Autor from "../models/Autor.mjs";
+import type { Request, Response } from 'express';
 
 /**
  * @swagger
@@ -44,12 +45,14 @@ import Autor from "./../models/Autor.mjs";
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  */
-async function findAll(req, res) {
+async function findAll(req: Request, res: Response) {
     try {
-        const { page = 1, limit = 10, search } = req.query;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const search = req.query.search as string || '';
         const skip = (page - 1) * limit;
         
-        let query = { isActive: true };
+        let query: any = { isActive: true };
         
         // Búsqueda por nombre o apodo
         if (search) {
@@ -64,7 +67,7 @@ async function findAll(req, res) {
                 .populate('canciones', 'name album duracion')
                 .sort({ name: 1 })
                 .skip(skip)
-                .limit(parseInt(limit)),
+                .limit(limit),
             Autor.countDocuments(query)
         ]);
 
@@ -72,13 +75,13 @@ async function findAll(req, res) {
             state: true,
             data: autores,
             pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
+                page: (page),
+                limit: (limit),
                 total,
                 pages: Math.ceil(total / limit)
             }
         });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({
             state: false,
             error: error.message
@@ -117,7 +120,7 @@ async function findAll(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function findById(req, res) {
+async function findById(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
@@ -132,7 +135,7 @@ async function findById(req, res) {
             state: true,
             data: result
         });
-    } catch (error) {
+    } catch (error: any) {
         return res.status(500).json({
             state: false,
             error: error.message
@@ -173,7 +176,7 @@ async function findById(req, res) {
  *       400:
  *         $ref: '#/components/responses/BadRequestError'
  */
-async function save(req, res) {
+async function save(req: Request, res: Response) {
     try {
         const record = new Autor(req.body);
         const result = await record.save();
@@ -183,11 +186,11 @@ async function save(req, res) {
             message: "Autor creado exitosamente",
             data: result
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({
                 state: false,
-                error: Object.values(error.errors).map(e => e.message).join(', ')
+                error: Object.values(error.errors).map((e: any)=> e.message).join(', ')
             });
         }
         return res.status(500).json({
@@ -237,7 +240,7 @@ async function save(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function update(req, res) {
+async function update(req: Request, res: Response) {
     const { id } = req.params;
     try {
         const updatedAutor = await Autor.findByIdAndUpdate(
@@ -256,11 +259,11 @@ async function update(req, res) {
             message: "Autor actualizado exitosamente",
             data: updatedAutor
         });
-    } catch (error) {
+    } catch (error: any) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({
                 state: false,
-                error: Object.values(error.errors).map(e => e.message).join(', ')
+                error: Object.values(error.errors).map((e: any) => e.message).join(', ')
             });
         }
         res.status(500).json({
@@ -302,7 +305,7 @@ async function update(req, res) {
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-async function deleteAutor(req, res) {
+async function deleteAutor(req: Request, res: Response) {
     try {
         const { id } = req.params;
         
@@ -324,7 +327,7 @@ async function deleteAutor(req, res) {
             state: true,
             message: "Autor eliminado exitosamente"
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message

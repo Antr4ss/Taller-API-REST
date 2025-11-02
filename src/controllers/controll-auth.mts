@@ -1,8 +1,10 @@
 import Usuario from '../models/Usuario.mjs';
 import { generateToken } from '../middlewares/auth.mjs';
+import type { Request, Response } from 'express';
+
 
 // Registro de usuario
-export async function register(req, res) {
+export async function register(req: Request, res: Response) {
     try {
         const { name, email, password } = req.body;
 
@@ -44,7 +46,7 @@ export async function register(req, res) {
             }
         });
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message
@@ -53,7 +55,7 @@ export async function register(req, res) {
 }
 
 // Login de usuario
-export async function login(req, res) {
+export async function login(req: Request, res: Response) {
     try {
         const { email, password } = req.body;
 
@@ -103,7 +105,7 @@ export async function login(req, res) {
             }
         });
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message
@@ -112,8 +114,15 @@ export async function login(req, res) {
 }
 
 // Obtener perfil del usuario autenticado
-export async function getProfile(req, res) {
+export async function getProfile(req: Request, res: Response) {
     try {
+        if (!req.user?.id) {
+            return res.status(401).json({
+                state: false,
+                error: 'No autenticado'
+            });
+        }
+
         const usuario = await Usuario.findById(req.user.id);
         if (!usuario) {
             return res.status(404).json({
@@ -127,7 +136,7 @@ export async function getProfile(req, res) {
             data: usuario
         });
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message
@@ -136,10 +145,17 @@ export async function getProfile(req, res) {
 }
 
 // Actualizar perfil del usuario
-export async function updateProfile(req, res) {
+export async function updateProfile(req: Request, res: Response) {
     try {
+        if (!req.user?.id) {
+            return res.status(401).json({
+                state: false,
+                error: 'No autenticado'
+            });
+        }
+
         const { name, email } = req.body;
-        const updates = {};
+        const updates: any = {};
 
         if (name) updates.name = name;
         if (email) {
@@ -169,7 +185,7 @@ export async function updateProfile(req, res) {
             data: usuario
         });
 
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             state: false,
             error: error.message

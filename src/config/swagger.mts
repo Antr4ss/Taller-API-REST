@@ -309,7 +309,7 @@ const options = {
             }
         ]
     },
-    apis: ['./routes/*.mjs', './controllers/*.mjs']
+    apis: ['./src/routes/*.mts', './src/controllers/*.mts', '/dist/routes/*.mjs', '/dist/controllers/*.mjs']
 };
 
 export const specs = swaggerJsdoc(options);
